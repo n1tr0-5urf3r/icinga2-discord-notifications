@@ -16,7 +16,6 @@ MARKDOWN_PARSER="pandoc"
 IFS=""
 
 # Fill in those
-WEBHOOK_URL=""
 THUMBNAIL_URL=""
 
 if [ -z "`which $CURLBIN`" ] ; then
@@ -33,7 +32,7 @@ Required parameters:
   -l HOSTNAME (\$host.name\$)
   -n HOSTDISPLAYNAME (\$host.display_name\$)
   -o HOSTOUTPUT (\$host.output\$)
-  -r USEREMAIL (\$user.email\$)
+  -r Webhook URL (\$user.vars.webhook_url\$)
   -s HOSTSTATE (\$host.state\$)
   -t NOTIFICATIONTYPE (\$notification.type\$)
 
@@ -78,7 +77,7 @@ do
     l) HOSTNAME=$OPTARG ;; # required
     n) HOSTDISPLAYNAME=$OPTARG ;; # required
     o) HOSTOUTPUT=$OPTARG ;; # required
-    r) USEREMAIL=$OPTARG ;; # required
+    r) WEBHOOK_URL=$OPTARG ;; # required
     s) HOSTSTATE=$OPTARG ;; # required
     t) NOTIFICATIONTYPE=$OPTARG ;; # required
     v) VERBOSE=$OPTARG ;;
@@ -95,7 +94,7 @@ done
 shift $((OPTIND - 1))
 
 ## Keep formatting in sync with mail-service-notification.sh
-for P in LONGDATETIME HOSTNAME HOSTDISPLAYNAME HOSTOUTPUT HOSTSTATE USEREMAIL NOTIFICATIONTYPE ; do
+for P in LONGDATETIME HOSTNAME HOSTDISPLAYNAME HOSTOUTPUT HOSTSTATE WEBHOOK_URL NOTIFICATIONTYPE ; do
         eval "PAR=\$${P}"
 
         if [ ! "$PAR" ] ; then

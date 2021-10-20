@@ -16,7 +16,6 @@ MARKDOWN_PARSER="pandoc"
 IFS=""
 
 # Fill in those
-WEBHOOK_URL=""
 THUMBNAIL_URL=""
 
 if [ -z "`which $CURLBIN`" ] ; then
@@ -34,7 +33,7 @@ Required parameters:
   -l HOSTNAME (\$host.name\$)
   -n HOSTDISPLAYNAME (\$host.display_name\$)
   -o SERVICEOUTPUT (\$service.output\$)
-  -r USEREMAIL (\$user.email\$)
+  -r Webhook URL (\$user.vars.webhook_url\$)
   -s SERVICESTATE (\$service.state\$)
   -t NOTIFICATIONTYPE (\$notification.type\$)
   -u SERVICEDISPLAYNAME (\$service.display_name\$)
@@ -81,7 +80,7 @@ do
     l) HOSTNAME=$OPTARG ;; # required
     n) HOSTDISPLAYNAME=$OPTARG ;; # required
     o) SERVICEOUTPUT=$OPTARG ;; # required
-    r) USEREMAIL=$OPTARG ;; # required
+    r) WEBHOOK_URL=$OPTARG ;; # required
     s) SERVICESTATE=$OPTARG ;; # required
     t) NOTIFICATIONTYPE=$OPTARG ;; # required
     u) SERVICEDISPLAYNAME=$OPTARG ;; # required
@@ -104,7 +103,7 @@ if [ ! "$LONGDATETIME" ] \
 || [ ! "$HOSTNAME" ] || [ ! "$HOSTDISPLAYNAME" ] \
 || [ ! "$SERVICENAME" ] || [ ! "$SERVICEDISPLAYNAME" ] \
 || [ ! "$SERVICEOUTPUT" ] || [ ! "$SERVICESTATE" ] \
-|| [ ! "$USEREMAIL" ] || [ ! "$NOTIFICATIONTYPE" ]; then
+|| [ ! "$WEBHOOK_URL" ] || [ ! "$NOTIFICATIONTYPE" ]; then
   Error "Requirement parameters are missing."
 fi
 
@@ -204,7 +203,3 @@ else
   echo "[Webhook]: Successfully sent the webhook."
 fi
 exit $EXIT_CODE
-
-
-
-
