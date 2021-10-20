@@ -1,14 +1,28 @@
 #!/bin/bash
+###############################################################################
+# Written by Fabian Ihle, fabi@ihlecloud.de                                   #
+# Created: 19.10.2021                                                         #
+# github: https://github.com/n1tr0-5urf3r/icinga2-discord-notifications       #
+#                                                                             #
+# Scripts to setup icinga2                                                #
+# notifications with a discord webhook                                        #
+# -------------------------------------------------------------               #
+# Changelog:                                                                  #
+# 191021 Version .1 - Created                                                 #
+###############################################################################
 
 CURLBIN="curl"
 MARKDOWN_PARSER="pandoc"
 IFS=""
 
+# Fill in those
+WEBHOOK_URL=""
+THUMBNAIL_URL=""
+
 if [ -z "`which $CURLBIN`" ] ; then
   echo "$CURLBIN not found."
   exit 1
 fi
-
 
 ## Function helpers
 Usage() {
@@ -93,20 +107,14 @@ case $HOSTSTATE in
 
   "UP")
     COLOR="25600"
-    CHARACTER="(&#10004;)"
-    SUBJECT_CHAR="=?UTF-8?B?4pyU?="
     ;;
 
   "DOWN")
     COLOR="9109504"
-    CHARACTER="(&#10008;)"
-    SUBJECT_CHAR="=?UTF-8?B?4pyY?="
     ;;
 
   "UNKNOWN")
     COLOR="8388736"
-    CHARACTER="(&#63;)"
-    SUBJECT_CHAR=" ? "
     ;;
 
   *)
@@ -147,7 +155,7 @@ len=${#EMBED_FIELDS[@]}
 
 WEBHOOK_DATA='{
   "username": "",
-  "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+  "avatar_url": "https://exchange.icinga.com//img/fav/cropped-icinga-favicon-512x512px-192x192.png",
   "embeds": [ {
   "color": '$COLOR',
     "author": {
@@ -155,7 +163,7 @@ WEBHOOK_DATA='{
     },
     "title": "'"$SUBJECT"'",
     "thumbnail": {
-        "url": "https://me.ihlecloud.de/img/logo.png"
+        "url": "'"$THUMBNAIL_URL"'"
     },
     "footer": {
         "text": "icinga2-discord-notification by N1tR0#0914",
@@ -180,9 +188,8 @@ WEBHOOK_DATA=""$WEBHOOK_DATA" $(printf "    ]
   } ]
 }")"
 
-WEBHOOK_URL=""
 
-curl --fail --progress-bar -H Content-Type:application/json -d "$WEBHOOK_DATA" "$WEBHOOK_URL"
+curl --fail -H Content-Type:application/json -d "$WEBHOOK_DATA" "$WEBHOOK_URL"
 EXIT_CODE=$?
 if [ ${EXIT_CODE} != 0 ]; then
   echo "[Webhook]: Unable to send webhook."
