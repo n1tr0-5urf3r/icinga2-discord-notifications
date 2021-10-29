@@ -9,6 +9,8 @@
 # -------------------------------------------------------------               #
 # Changelog:                                                                  #
 # 191021 Version .1 - Created                                                 #
+# 201021 Version .2 - Added contact support                                   #
+# 291021 Version .3 - Fix bug with newlines in service output                 #
 ###############################################################################
 
 CURLBIN="curl"
@@ -130,15 +132,20 @@ case $SERVICESTATE in
     ;;
 esac
 
+# Replace newlines from service output as this breaks the embed payload
+SERVICEOUTPUT=$(echo "{$SERVICEOUTPUT}" | sed ':a;N;$!ba;s/\n/, /g')
+
 ## Build the message's subject
 SUBJECT="[$NOTIFICATIONTYPE Notification] $SERVICESTATE - ($HOSTDISPLAYNAME - $SERVICEDISPLAYNAME)"
 
 EMBED_FIELDS=();
 
-EMBED_FIELDS+=("$HOSTNAME" "($HOSTADDRESS)")
+if [ -n "$HOSTADDRESS" ] ; then
+  # TODO: add IPv6 support
+  EMBED_FIELDS+=("$HOSTNAME" "$HOSTADDRESS")
+fi
 
 EMBED_FIELDS+=("Notification Date" "$LONGDATETIME")
-
 
 if [ -n "$NOTIFICATIONCOMMENT" ] ; then
     EMBED_FIELDS+=("Comment" ""$NOTIFICATIONCOMMENT"/"$NOTIFICATIONAUTHORNAME"")
