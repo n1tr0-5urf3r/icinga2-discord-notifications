@@ -4,11 +4,12 @@
 # Created: 19.10.2021                                                         #
 # github: https://github.com/n1tr0-5urf3r/icinga2-discord-notifications       #
 #                                                                             #
-# Scripts to setup icinga2                                                #
+# Scripts to setup icinga2                                                    #
 # notifications with a discord webhook                                        #
 # -------------------------------------------------------------               #
 # Changelog:                                                                  #
 # 191021 Version .1 - Created                                                 #
+# 190922 Version .3.2 - Fix crash when quotes are in the output               #
 ###############################################################################
 
 CURLBIN="curl"
@@ -120,6 +121,10 @@ case $HOSTSTATE in
     COLOR="13882323"
     ;;
 esac
+
+# Replace newlines from service output as this breaks the embed payload and escape quotes
+HOSTOUTPUT=$(echo "${HOSTOUTPUT}" | sed ':a;N;$!ba;s/\n/, /g' | sed 's/"/\\"/g' | sed "s/'/\\\'/g")
+NOTIFICATIONCOMMENT=$(echo -e "${NOTIFICATIONCOMMENT}" | sed ':a;N;$!ba;s/\n/\\\\n/g' | sed 's/"/\\\\"/g' | sed "s/'/\\\'/g")
 
 ## Build the message's subject
 SUBJECT="[$NOTIFICATIONTYPE Notification] Host $HOSTDISPLAYNAME - $HOSTSTATE"
