@@ -13,6 +13,7 @@
 # 291021 Version .3 - Fix bug with newlines in service output                 #
 # 061121 Version .3.1 - Fix variable expansion in service notification        #
 # 190922 Version .3.2 - Fix crash when quotes are in the output               #
+# 260922 Version .3.3 - Shellcheck conformity, fix multi-line comments        #
 ###############################################################################
 
 CURLBIN="curl"
@@ -22,7 +23,7 @@ IFS=""
 # Fill in those
 THUMBNAIL_URL=""
 
-if [ -z "`which $CURLBIN`" ] ; then
+if [ -z "$(command -v $CURLBIN)" ] ; then
   echo "$CURLBIN not found."
   exit 1
 fi
@@ -62,7 +63,7 @@ Help() {
 
 Error() {
   if [ "$1" ]; then
-    echo $1
+    echo "$1"
   fi
   Usage;
   exit 1;
@@ -135,8 +136,8 @@ case $SERVICESTATE in
 esac
 
 # Replace newlines from service output as this breaks the embed payload and escape quotes
-SERVICEOUTPUT=$(echo "${SERVICEOUTPUT}" | sed ':a;N;$!ba;s/\n/, /g' | sed 's/"/\\"/g' | sed "s/'/\\\'/g")
-NOTIFICATIONCOMMENT=$(echo -e "${NOTIFICATIONCOMMENT}" | sed ':a;N;$!ba;s/\n/\\\\n/g' | sed 's/"/\\\\"/g' | sed "s/'/\\\'/g")
+SERVICEOUTPUT=$(echo "${SERVICEOUTPUT}" | sed ':a;N;$!ba;s/\r//g' | sed ':a;N;$!ba;s/\n/, /g' | sed 's/"/\\"/g')
+NOTIFICATIONCOMMENT=$(echo "${NOTIFICATIONCOMMENT}" | sed ':a;N;$!ba;s/\r//g' | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g')
 
 ## Build the message's subject
 SUBJECT="[$NOTIFICATIONTYPE Notification] $SERVICESTATE - ($HOSTDISPLAYNAME - $SERVICEDISPLAYNAME)"
@@ -151,7 +152,7 @@ fi
 EMBED_FIELDS+=("Notification Date" "$LONGDATETIME")
 
 if [ -n "$NOTIFICATIONCOMMENT" ] ; then
-    EMBED_FIELDS+=("Comment" ""$NOTIFICATIONCOMMENT"/"$NOTIFICATIONAUTHORNAME"")
+    EMBED_FIELDS+=("Comment" "$NOTIFICATIONCOMMENT/$NOTIFICATIONAUTHORNAME")
 fi
 
 
@@ -161,12 +162,12 @@ if [ -n "$ICINGAWEB2URL" ] ; then
 fi
 
 
-if [  -n "$NOTES" -a ! -z "`which $MARKDOWN_PARSER`" ] ; then
-        NOTES_HTML=`echo "$NOTES" | $MARKDOWN_PARSER`
+if [ -n "$NOTES" ] && [ -n "$(command -v $MARKDOWN_PARSER)" ] ; then
+        NOTES_HTML=$(echo "$NOTES" | $MARKDOWN_PARSER)
         EMBED_FIELDS+=("Notes" "$NOTES_HTML")
 fi
 
-vars=(${EMBED_FIELDS[@]})
+vars=("${EMBED_FIELDS[@]}")
 len=${#EMBED_FIELDS[@]}
 
 
@@ -191,17 +192,17 @@ WEBHOOK_DATA='{
 '
 
 for ((i = 0; i < len; i += 2)); do
-    WEBHOOK_DATA=""$WEBHOOK_DATA" $(printf "{")"
-    WEBHOOK_DATA=""$WEBHOOK_DATA" $(printf "\"name\": \""${vars[i]}"\"")"
-    WEBHOOK_DATA=""$WEBHOOK_DATA" $(printf ", ")"
-    WEBHOOK_DATA=""$WEBHOOK_DATA" $(printf "\"value\": \""${vars[i + 1]}"\"")"
-    WEBHOOK_DATA=""$WEBHOOK_DATA" $(printf "}")"
+    WEBHOOK_DATA="$WEBHOOK_DATA $(printf "{")"
+    WEBHOOK_DATA="$WEBHOOK_DATA $(printf "\"name\": \"%s\"" "${vars[i]}")" 
+    WEBHOOK_DATA="$WEBHOOK_DATA $(printf ", ")"
+    WEBHOOK_DATA="$WEBHOOK_DATA $(printf "\"value\": \"%s\"" "${vars[i + 1]}")"
+    WEBHOOK_DATA="$WEBHOOK_DATA $(printf "}")"
     if [ $i -lt $((len - 2)) ]; then
-        WEBHOOK_DATA=""$WEBHOOK_DATA" $(printf ", ")"
+        WEBHOOK_DATA="$WEBHOOK_DATA $(printf ", ")"
     fi
 done
 
-WEBHOOK_DATA=""$WEBHOOK_DATA" $(printf "    ]
+WEBHOOK_DATA="$WEBHOOK_DATA $(printf "    ]
   } ]
 }")"
 
