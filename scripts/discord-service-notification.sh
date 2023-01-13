@@ -14,6 +14,7 @@
 # 061121 Version .3.1 - Fix variable expansion in service notification        #
 # 190922 Version .3.2 - Fix crash when quotes are in the output               #
 # 260922 Version .3.3 - Shellcheck conformity, fix multi-line comments        #
+# 130123 Version .3.4 - Fix crash with missing username                       #
 ###############################################################################
 
 CURLBIN="curl"
@@ -172,7 +173,7 @@ len=${#EMBED_FIELDS[@]}
 
 
 WEBHOOK_DATA='{
-  "username": "",
+  "username": "Icinga2 Monitoring",
   "avatar_url": "https://exchange.icinga.com//img/fav/cropped-icinga-favicon-512x512px-192x192.png",
   "embeds": [ {
   "color": '$COLOR',
