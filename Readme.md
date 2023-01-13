@@ -4,10 +4,10 @@
   <img width="400" src="img/example1.png" alt="Example" align="center">
 </p>
 <br>
-<p align="center">
+<h3 align="center">
     <a href="https://github.com/n1tr0-5urf3r/icinga2-discord-notifications/releases/">Download Latest
     </a>・
-    <a href="https://exchange.icinga.com/n1tr0-5urf3r">Other Projects</a>・<a href="https://www.paypal.com/donate/?hosted_button_id=KXMYX49C6MLLN">Donate</a></p>
+    <a href="https://exchange.icinga.com/n1tr0-5urf3r">Other Projects</a>・<a href="https://www.paypal.com/donate/?hosted_button_id=KXMYX49C6MLLN">Donate</a></h3>
 
 ---
 
