@@ -31,8 +31,4 @@ Additionally, copy the contents of the `scripts` folder to your icinga2 installa
 ## Donation
 If you like my work please support me with a donation :) 
 
-<div style="text-align: center;">
-
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=KXMYX49C6MLLN)
-
-</div>
