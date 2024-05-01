@@ -15,6 +15,7 @@
 # 190922 Version .3.2 - Fix crash when quotes are in the output               #
 # 260922 Version .3.3 - Shellcheck conformity, fix multi-line comments        #
 # 130123 Version .3.4 - Fix crash with missing username                       #
+# 010524 Version .3.5 - Fix crash with tabs and spaces in output              #
 ###############################################################################
 
 CURLBIN="curl"
@@ -137,8 +138,8 @@ case $SERVICESTATE in
 esac
 
 # Replace newlines from service output as this breaks the embed payload and escape quotes
-SERVICEOUTPUT=$(echo "${SERVICEOUTPUT}" | sed ':a;N;$!ba;s/\r//g' | sed ':a;N;$!ba;s/\n/, /g' | sed 's/"/\\"/g')
-NOTIFICATIONCOMMENT=$(echo "${NOTIFICATIONCOMMENT}" | sed ':a;N;$!ba;s/\r//g' | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g')
+SERVICEOUTPUT=$(echo "${SERVICEOUTPUT}" | sed ':a;N;$!ba;s/\r//g' | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g' | sed -e "s/[[:space:]]\+/ /g")
+NOTIFICATIONCOMMENT=$(echo "${NOTIFICATIONCOMMENT}" | sed ':a;N;$!ba;s/\r//g' | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g' | sed -e "s/[[:space:]]\+/ /g")
 
 ## Build the message's subject
 SUBJECT="[$NOTIFICATIONTYPE Notification] $SERVICESTATE - ($HOSTDISPLAYNAME - $SERVICEDISPLAYNAME)"
